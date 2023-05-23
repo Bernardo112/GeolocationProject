@@ -1,6 +1,4 @@
-<!DOCTYPE HTML>
-<html>
-<head>
+<!DOCTYPE html>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta http-equiv="Content-Security-Policy" content="default-src * data: gap: content: https://ssl.gstatic.com; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'">
@@ -10,23 +8,101 @@
     <link rel="stylesheet" href="components/loader.css">
     <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/style.css">
+<html>
+  <head>
+    <title>Reverse Geocoding</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
     <script>
+      /**
+       * @license
+       * Copyright 2019 Google LLC. All Rights Reserved.
+       * SPDX-License-Identifier: Apache-2.0
+       */
+      function initMap() {
+        const map = new google.maps.Map(document.getElementById("map"), {
+          zoom: 8,
+          center: { lat: 40.731, lng: -73.997 },
+        });
+        const geocoder = new google.maps.Geocoder();
+        const infowindow = new google.maps.InfoWindow();
+
+        document.getElementById("submit").addEventListener("click", () => {
+          geocodeLatLng(geocoder, map, infowindow);
+        });
+      }
+
+      function geocodeLatLng(geocoder, map, infowindow) {
+        const input = document.getElementById("latlng").value;
+        const latlngStr = input.split(",", 2);
+        const latlng = {
+          lat: parseFloat(latlngStr[0]),
+          lng: parseFloat(latlngStr[1]),
+        };
+
+        geocoder
+          .geocode({ location: latlng })
+          .then((response) => {
+            if (response.results[0]) {
+              map.setZoom(11);
+
+              const marker = new google.maps.Marker({
+                position: latlng,
+                map: map,
+              });
+
+              infowindow.setContent(response.results[0].formatted_address);
+              infowindow.open(map, marker);
+            } else {
+              window.alert("No results found");
+            }
+          })
+          .catch((e) => window.alert("Geocoder failed due to: " + e));
+      }
+
+      window.initMap = initMap;
     </script>
-</head>
-<body>
-    <h1 style="text-align:center;">Onde você está?</h1><br>
-	<div class="row">
-            <div class="d-grid gap-2 col-8 mx-auto">
-                    <button class="btn btn-outline-dark" onclick="geolocationF()">Mostrar</button>
-            <div>
-    </div><br><br>
+    <style>
+      /**
+       * @license
+       * Copyright 2019 Google LLC. All Rights Reserved.
+       * SPDX-License-Identifier: Apache-2.0
+       */
+      /* 
+       * Always set the map height explicitly to define the size of the div element
+       * that contains the map. 
+       */
+      #map {
+        height: 70%;
+      }
+
+      /* Optional: Makes the sample page fill the window. */
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      #latlng {
+        width: 225px;
+      }
+    </style>
+  </head>
+  <body>
+      <h1 style="text-align:center;">Qual é o meu endereço?</h1><hr>
     <div class="input-group mb-3">
-        <span class="input-group-text" id="basic-addon1">Latitude</span>
-        <input type="text" class="form-control" id="latitude" aria-label="Username" aria-describedby="basic-addon1" disabled>
+        <input id="latlng" type="text" value="40.714224,-73.961452" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
     </div>
-    <div class="input-group mb-3">
-        <span class="input-group-text" id="basic-addon1">Longitude</span>
-        <input type="text" class="form-control" id="longitude" aria-label="Username" aria-describedby="basic-addon1" disabled>
+    <div class="d-grid gap-2 col-8 mx-auto">
+        <button class="btn btn-outline-dark" onclick="geolocationF()">Minhas coordenadas</button>
+        <button class="btn btn-outline-dark" id="submit">Meu endereço</button>
     </div>
-</body>
+
+    <br>
+    <div id="map"></div>
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA-SY0_Kpsm--f3wKT9aqvKihSTXtvO80k&callback=initMap&v=weekly"
+      defer
+    ></script>
+  </body>
 </html>

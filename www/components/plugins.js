@@ -3,8 +3,8 @@
 function geolocationF(){
 
     var onSuccess = function(position){
-            document.getElementById("latitude").value = position.coords.latitude;
-            document.getElementById("longitude").value = position.coords.longitude;
+            //document.getElementById("latitude").value = position.coords.latitude;
+            document.getElementById("latlng").value = position.coords.latitude + "," + position.coords.longitude;
             /*alert(
                 'Latitude: ' + position.coords.latitude + '\n' + 
                 'Longitude: ' + position.coords.longitude + '\n'
